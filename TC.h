@@ -1,9 +1,11 @@
 #ifndef TC_H_
 #define TC_H_
 #include<iostream>
+#include <algorithm>
+
 #include<vector>
 
-extern "C" uint8_t addNumbers(uint8_t a, uint8_t b);
+extern "C" void vectorAdd(uint8_t* a, uint8_t* b, unsigned int c, unsigned int n);
 
 using std::vector;
 
@@ -16,8 +18,8 @@ private:
 public:
     TC();
     TC(vector<uint8_t>& number, int position);
+    static vector<uint8_t> getNumber(TC number);
     static bool isNumberZero(TC number); //sprawdza czy zero
-    static bool isVectorZero(const vector<uint8_t>& number); //sprawdza czy vector jest zerowy (zobaczę potem czy potrzebne)
     static uint8_t rightShift(const uint8_t& number, int n); // Zobaczymy może dam do prywatnych? //przesunięcia
     static uint8_t leftShift(const uint8_t& number, int n); // tak samo jak wyżej
     static void printTC(TC& number);

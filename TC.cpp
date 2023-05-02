@@ -15,6 +15,9 @@ bool TC::isNumberZero(TC number){
     }
     return true;
 }
+vector<uint8_t> TC::getNumber(TC number){
+    return number._number;
+}
 /// <summary>
 /// Konstruktor
 /// </summary>
@@ -187,18 +190,25 @@ void TC::negateBits(TC& number){
 }
 
 TC TC::add(TC& number1, TC& number2){
-    vector<uint8_t> newNumber;
+   
     int leastSignificant = number1._position < number2._position ? number2._position : number2._position;
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
                            mostSignificantNumber1 : mostSignificantNumber2; 
-    int diffBettwenLeastAndMost = mostSignificant + leastSignificant ;
-    while (diffBettwenLeastAndMost >= 0) { 
-        newNumber.push_back(0);
-        diffBettwenLeastAndMost -= 8;
+    int number3Size = ((mostSignificant - leastSignificant) + 9) / 8 ; 
+    vector<uint8_t> newNumber(number3Size);
+    int tempNS = number3Size - 1;
+    int tempLS = leastSignificant;
+    while(number1._position / 8 != tempLS / 8){
+        tempLS += 7;
+        tempNS -= 1;
     }
-    return TC(newNumber, 2); //zwracanie losowej
+
+    vectorAdd(&newNumber[1], &number1._number[0], tempNS, 0);
+    vectorAdd(&newNumber[1], &number2._number[0], tempNS + 1, 1);
+
+    return TC(newNumber, leastSignificant); //zwracanie losowej
 }
     
 
