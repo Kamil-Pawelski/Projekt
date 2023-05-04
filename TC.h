@@ -5,17 +5,20 @@
 
 #include<vector>
 
-extern "C" void vectorAdd(uint8_t* a, uint8_t* b, unsigned int c, unsigned int n);
+extern "C" void vectorAdd(uint8_t* a, uint8_t* b, unsigned int c);
+extern "C" void vectorSub(uint8_t* a, uint8_t* b, unsigned int c);
+
 
 using std::vector;
 
 class TC {
 private:
     vector<uint8_t> _number;
-    int _position;
+    
     static void setNegative(uint8_t& byt, int n); //ustawia reszte bitów na 1 w liczbie (00000001) -> (11111111) tylko w wypadku jak jest ujemna
 
 public:
+    int _position;
     TC();
     TC(vector<uint8_t>& number, int position);
     static vector<uint8_t> getNumber(TC number);

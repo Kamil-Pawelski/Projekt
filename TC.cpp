@@ -192,22 +192,22 @@ void TC::negateBits(TC& number){
 TC TC::add(TC& number1, TC& number2){
    
     int leastSignificant = number1._position < number2._position ? number2._position : number2._position;
+    std::cout <<"ls" << leastSignificant << std::endl;
+
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
                            mostSignificantNumber1 : mostSignificantNumber2; 
     int number3Size = ((mostSignificant - leastSignificant) + 9) / 8 ; 
     vector<uint8_t> newNumber(number3Size);
-    int tempNS = number3Size - 1;
     int tempLS = leastSignificant;
     while(number1._position / 8 != tempLS / 8){
         tempLS += 7;
-        tempNS -= 1;
     }
-
-    vectorAdd(&newNumber[1], &number1._number[0], tempNS, 0);
-    vectorAdd(&newNumber[1], &number2._number[0], tempNS + 1, 1);
-
+    
+    vectorAdd(&newNumber[1], &number1._number[0], number1._number.size()-1);
+    vectorAdd(&newNumber[1], &number2._number[0], number2._number.size()-1);
+    
     return TC(newNumber, leastSignificant); //zwracanie losowej
 }
     
