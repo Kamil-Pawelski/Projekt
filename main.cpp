@@ -6,7 +6,7 @@ int main(){
 
 	
 	TC numb1(firstNumber, 0);
-	TC numb2(secondNumber, -8);
+	TC numb2(secondNumber, -16);
 	TC::printTC(numb2);
 	vector<uint8_t> numb32 = TC::getNumber(numb2);
 		std::cout << std::endl;
@@ -30,7 +30,7 @@ int main(){
 	TC::printTC(numb3);
 	vector<uint8_t> numb33 = TC::getNumber(numb3);
 	std::cout << std::endl;
-	for(int i = 0; i < 6; i++){
+	for(int i = 0; i < numb33.size(); i++){
 		std::cout << (int)numb33[i] << std::endl;
 	}
 
@@ -59,6 +59,15 @@ int main(){
 	vectorSub(&aaaaa[2], &secondNumber2[0], secondNumber2.size() - 1);
 
 	std::cout << (int) aaaaa[0]<< std::endl << (int) aaaaa[1]<< std::endl <<  (int)aaaaa[2]<< std::endl <<  (int) aaaaa[3]<< std::endl<<  (int) aaaaa[4] << std::endl<<  (int) aaaaa[5] << std::endl;
+
+	TC numb122(firstNumber1, 0);
+	TC numb222(secondNumber2, -16);
+
+	TC result22 = TC::sub(numb122, numb222);
+
+	aaaaa = TC::getNumber(result22);
+
+	 	std::cout << (int) aaaaa[0]<< std::endl << (int) aaaaa[1]<< std::endl <<  (int)aaaaa[2]<< std::endl <<  (int) aaaaa[3]<< std::endl<<  (int) aaaaa[4] << std::endl<<  (int) aaaaa[5] << std::endl;
 
 return 0;
 }

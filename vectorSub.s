@@ -6,8 +6,7 @@ vectorSub:
   clc           
   movl 8(%ebp), %ecx      
   movl 12(%ebp), %edx    
-  movl 16(%ebp), %edi     
-          
+  movl 16(%ebp), %edi         
 vector_sub:
   movb (%edx,%edi), %al   
   sbb %al, (%ecx,%edi)    

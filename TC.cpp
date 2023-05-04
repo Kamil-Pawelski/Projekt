@@ -119,7 +119,7 @@ void TC::setNegative(uint8_t& number, int n)
 /// Wypisuje naszą liczbę w U2
 /// </summary>
 /// <param name="number">Liczba do wypisania</param>
-void TC::printTC(TC& number)
+void TC::printTC(TC& number) // nie działa XD
 {
     if (number._position >= 0) { //dla pozycji nieujemnych
         for (int i = 0; i < number._number.size(); i++) {
@@ -192,24 +192,58 @@ void TC::negateBits(TC& number){
 TC TC::add(TC& number1, TC& number2){
    
     int leastSignificant = number1._position < number2._position ? number2._position : number2._position;
-    std::cout <<"ls" << leastSignificant << std::endl;
-
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
                            mostSignificantNumber1 : mostSignificantNumber2; 
     int number3Size = ((mostSignificant - leastSignificant) + 9) / 8 ; 
     vector<uint8_t> newNumber(number3Size);
-    int tempLS = leastSignificant;
-    while(number1._position / 8 != tempLS / 8){
-        tempLS += 7;
+    int tempLS = mostSignificant;
+    unsigned int index = 1;
+    while(mostSignificantNumber1/ 8 != tempLS / 8){
+        tempLS -= 8;
+        index++;
     }
-    
-    vectorAdd(&newNumber[1], &number1._number[0], number1._number.size()-1);
-    vectorAdd(&newNumber[1], &number2._number[0], number2._number.size()-1);
-    
-    return TC(newNumber, leastSignificant); //zwracanie losowej
+    vectorAdd(&newNumber[index], &number1._number[0], number1._number.size()-1);
+    tempLS = mostSignificant;
+    index = 1;
+    while(mostSignificantNumber2/ 8 != tempLS / 8){
+        tempLS -= 8;
+        index++;
+    }
+    vectorAdd(&newNumber[index], &number2._number[0], number2._number.size()-1);
+    //sprawdzenie która większa ujemna czy dodatnia spoko
+    //jeśli ujemna i przepełnienie to zmieniamy 1 na 255 a jak nie to spoko nic ok
+    //i jak nie ma przeniesienia [0] = 0 to erase like
+    return TC(newNumber, leastSignificant); 
 }
     
 
- 
+ TC TC::sub(TC& number1, TC& number2){
+   
+    int leastSignificant = number1._position < number2._position ? number2._position : number2._position;
+    int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
+    int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
+    int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
+                           mostSignificantNumber1 : mostSignificantNumber2; 
+    int number3Size = ((mostSignificant - leastSignificant) + 9) / 8 ; 
+    vector<uint8_t> newNumber(number3Size);
+    int tempLS = mostSignificant;
+    unsigned int index = 1;
+    while(mostSignificantNumber1/ 8 != tempLS / 8){
+        tempLS -= 8;
+        index++;
+    }
+    vectorAdd(&newNumber[index], &number1._number[0], number1._number.size()-1);
+    tempLS = mostSignificant;
+    index = 1;
+    while(mostSignificantNumber2/ 8 != tempLS / 8){
+        tempLS -= 8;
+        index++;
+    }
+    vectorSub(&newNumber[index], &number2._number[0], number2._number.size()-1);
+    //sprawdzenie która większa ujemna czy dodatnia spoko //analogia coś do dodawania
+    //jeśli ujemna i przepełnienie to zmieniamy 1 na 255 a jak nie to spoko nic ok
+    //i jak nie ma przeniesienia [0] = 0 to erase like
+    return TC(newNumber, leastSignificant); 
+}
