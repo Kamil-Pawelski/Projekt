@@ -86,7 +86,7 @@ uint8_t TC::leftShift(const uint8_t& number, int n)
 /// </summary>
 /// <param name="byt">Liczba do zamiany</param>
 /// <param name="n">Liczba 1 do dopisania</param>
-void TC::setNegative(uint8_t& number, int n)
+void TC::setNegative(uint8_t& number, int n) //do wywalenia po prostu = xd
 {
     switch (n) {
     case 1:
@@ -185,13 +185,12 @@ void TC::printTC(TC& number) // nie działa XD
 void TC::negateBits(TC& number){
     for(int i = 0; i < number._number.size(); i++){
        number._number[i] = ~(number._number[i]);
-    } // dodać 1 asemblerem bo negacja (w wypadku 1000000000 00000000 wyjdzie tak samo w wypadku 00000100 000000000 wyjdzie 11111100 00000000)
-
+    } 
 }
 
 TC TC::add(TC& number1, TC& number2){
    
-    int leastSignificant = number1._position < number2._position ? number2._position : number2._position;
+    int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
@@ -221,7 +220,7 @@ TC TC::add(TC& number1, TC& number2){
 
  TC TC::sub(TC& number1, TC& number2){
    
-    int leastSignificant = number1._position < number2._position ? number2._position : number2._position;
+    int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
@@ -245,5 +244,18 @@ TC TC::add(TC& number1, TC& number2){
     //sprawdzenie która większa ujemna czy dodatnia spoko //analogia coś do dodawania
     //jeśli ujemna i przepełnienie to zmieniamy 1 na 255 a jak nie to spoko nic ok
     //i jak nie ma przeniesienia [0] = 0 to erase like
+    return TC(newNumber, leastSignificant); 
+}
+
+ TC TC::mul(TC& number1, TC& number2){
+   
+    int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
+    int number3Size = number1._number.size() + number2._number.size(); 
+    vector<uint8_t> newNumber(number3Size);
+
+    for (int i = number2._number.size() - 1; i >= 0; i--) {
+       vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i + 1);
+       }
+    
     return TC(newNumber, leastSignificant); 
 }

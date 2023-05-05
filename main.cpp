@@ -1,73 +1,40 @@
 #include <iostream>
 #include "TC.h"
 int main(){
-	 vector<uint8_t> firstNumber = {0x12, 0x7e, 0x60};
-     vector<uint8_t> secondNumber = {0xf0, 0xfa, 0xfb, 0x6e};
 
-	
-	TC numb1(firstNumber, 0);
-	TC numb2(secondNumber, -16);
-	TC::printTC(numb2);
-	vector<uint8_t> numb32 = TC::getNumber(numb2);
-		std::cout << std::endl;
+	 vector<uint8_t> a = {0x12, 0x34, 0x56, 0x78};
+   vector<uint8_t> b = {0x11, 0x22, 0x33};
+    TC na(a, -8);
+    TC ba(b, 0);
+    TC mull = TC::mul(na,ba);
+    TC::printTC(mull);
+    std::cout << std::endl << mull._position << std::endl;
+     vector<uint8_t> c(7);
+          vector<uint8_t> e(7);
 
-	std::cout << std::endl;
-	std::cout << std::endl;
-	std::cout << std::endl;
+ uint8_t ab = 2;
+ uint8_t ac = 2;
+ vector<uint8_t> d = TC::getNumber(mull);
+   
 
-	for(int i = 0; i < numb32.size(); i++){
-		std::cout << (int)numb32[i] << std::endl;
-	}
-		std::cout << std::endl;
-	std::cout << std::endl;
-	std::cout << std::endl;
+ for(int i = b.size()-1; i >= 0; i--)
+  vectorMul(&a[0], &b[i], &c[0], a.size(), i +1);
 
-	TC numb3 = TC::add(numb1, numb2);
 
-	std::cout << std::endl;std::cout << std::endl;
-	std::cout <<"XD" << " " << numb3._position <<std::endl;
-	std::cout << std::endl;
-	TC::printTC(numb3);
-	vector<uint8_t> numb33 = TC::getNumber(numb3);
-	std::cout << std::endl;
-	for(int i = 0; i < numb33.size(); i++){
-		std::cout << (int)numb33[i] << std::endl;
-	}
-
-	TC numb4 = TC::add(numb1, numb2);
-	TC::printTC(numb4);
-	vector<uint8_t> numb334 = TC::getNumber(numb3);
-	std::cout << std::endl;
-	for(int i = 0; i < 5; i++){
-		std::cout << (int)numb334[i] << std::endl;
-	}
-
-	
-	std::cout << std::endl;
-	uint8_t ba[2] = {0,24};
-	uint8_t cd[2] ={0, 22};
-	vectorSub(&cd[0], &ba[0], 1);
-	
-	vector<uint8_t> firstNumber1 = {12, 132, 13};
-    vector<uint8_t> secondNumber2 = {20, 12, 2, 12};
-	vector<uint8_t> aaaaa = {0,0,0,0,0,0};
-
-	vectorAdd(&aaaaa[1], &firstNumber1[0], firstNumber1.size() - 1);
-	std::cout << (int) aaaaa[0]<< std::endl << (int) aaaaa[1]<< std::endl <<  (int)aaaaa[2]<< std::endl <<  (int) aaaaa[3]<< std::endl<<  (int) aaaaa[4] << std::endl<<  (int) aaaaa[5] << std::endl;
-	std::cout << std::endl;
-
-	vectorSub(&aaaaa[2], &secondNumber2[0], secondNumber2.size() - 1);
-
-	std::cout << (int) aaaaa[0]<< std::endl << (int) aaaaa[1]<< std::endl <<  (int)aaaaa[2]<< std::endl <<  (int) aaaaa[3]<< std::endl<<  (int) aaaaa[4] << std::endl<<  (int) aaaaa[5] << std::endl;
-
-	TC numb122(firstNumber1, 0);
-	TC numb222(secondNumber2, -16);
-
-	TC result22 = TC::sub(numb122, numb222);
-
-	aaaaa = TC::getNumber(result22);
-
-	 	std::cout << (int) aaaaa[0]<< std::endl << (int) aaaaa[1]<< std::endl <<  (int)aaaaa[2]<< std::endl <<  (int) aaaaa[3]<< std::endl<<  (int) aaaaa[4] << std::endl<<  (int) aaaaa[5] << std::endl;
-
+ for(int i = b.size()-1; i >= 0; i--)
+  vectorMul(&a[0], &b[i], &e[0], a.size(), i +1);
+  for (auto i : c) {
+    std::cout << std::hex << (int)i << " ";
+  }
+    std::cout << std::endl;
+  for (auto i : d) {
+    std::cout << std::hex << (int)i << " ";
+  }
+    std::cout << std::endl;
+  for (auto i : e) {
+    std::cout << std::hex << (int)i << " ";
+  }
+  std::cout << std::endl;
+ std::cout << int(ab) << std::endl;
 return 0;
 }
