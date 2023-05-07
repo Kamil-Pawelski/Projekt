@@ -13,8 +13,10 @@ vector_add:
   decl %edi
   jns vector_add               
   jnc end
+carry:
   dec %ecx
   incb (%ecx)
+  je carry  
 end:
   popl %edi
   popl %ebp

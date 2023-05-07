@@ -31,6 +31,7 @@ public:
     static TC add(TC& number1, TC& number2);
     static TC sub(TC& number1, TC& number2);
     static TC mul(TC& number1, TC& number2);
+    static TC div(TC& number1, TC& number2);
 
 };
 #endif

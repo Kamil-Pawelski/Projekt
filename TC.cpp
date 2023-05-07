@@ -186,10 +186,12 @@ void TC::negateBits(TC& number){
     for(int i = 0; i < number._number.size(); i++){
        number._number[i] = ~(number._number[i]);
     } 
+    uint8_t one = 1;
+    vectorAdd(&number._number[number._number.size() - 1], &one, 0);
 }
 
 TC TC::add(TC& number1, TC& number2){
-   
+
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
@@ -199,6 +201,7 @@ TC TC::add(TC& number1, TC& number2){
     vector<uint8_t> newNumber(number3Size);
     int tempLS = mostSignificant;
     unsigned int index = 1;
+
     while(mostSignificantNumber1/ 8 != tempLS / 8){
         tempLS -= 8;
         index++;
@@ -214,6 +217,7 @@ TC TC::add(TC& number1, TC& number2){
     //sprawdzenie która większa ujemna czy dodatnia spoko
     //jeśli ujemna i przepełnienie to zmieniamy 1 na 255 a jak nie to spoko nic ok
     //i jak nie ma przeniesienia [0] = 0 to erase like
+   
     return TC(newNumber, leastSignificant); 
 }
     
@@ -256,6 +260,11 @@ TC TC::add(TC& number1, TC& number2){
     for (int i = number2._number.size() - 1; i >= 0; i--) {
        vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i + 1);
        }
-    
+    //tu też manipulacja 1 znakiem
     return TC(newNumber, leastSignificant); 
+}
+
+TC TC::div(TC& number1, TC& number2){
+    vector<uint8_t> quotient;
+    return TC(quotient , 0);
 }
