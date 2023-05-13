@@ -198,7 +198,9 @@ TC TC::add(TC& number1, TC& number2){
     int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
                            mostSignificantNumber1 : mostSignificantNumber2; 
     int number3Size = ((mostSignificant - leastSignificant) + 9) / 8 ; 
+    uint8_t one = 1;
     vector<uint8_t> newNumber(number3Size);
+    TC newTC(newNumber, leastSignificant);
     int tempLS = mostSignificant;
     unsigned int index = 1;
 
@@ -206,19 +208,33 @@ TC TC::add(TC& number1, TC& number2){
         tempLS -= 8;
         index++;
     }
-    vectorAdd(&newNumber[index], &number1._number[0], number1._number.size()-1);
+    vectorAdd(&newTC._number[index], &number1._number[0], number1._number.size()-1);
+    
     tempLS = mostSignificant;
     index = 1;
+    
     while(mostSignificantNumber2/ 8 != tempLS / 8){
         tempLS -= 8;
         index++;
     }
-    vectorAdd(&newNumber[index], &number2._number[0], number2._number.size()-1);
+    vectorAdd(&newTC._number[index], &number2._number[0], number2._number.size()-1);
+    if(number1._number[0] > 127 && number2._number[0] > 127){
+        negateBits(newTC);
+    } else if (number1._number[0] > 127 && number1._number[0] < 127) {
+        if(isNegativeBigger(number1, number2, mostSignificantNumber1, mostSignificantNumber2)){
+            negateBits(newTC);
+        }
+    } else if(number1._number[0] < 127 && number1._number[0] > 127){
+        if(isNegativeBigger(number2, number1, mostSignificantNumber1, mostSignificantNumber2)){
+            negateBits(newTC);
+        }
+    }
+    
     //sprawdzenie która większa ujemna czy dodatnia spoko
     //jeśli ujemna i przepełnienie to zmieniamy 1 na 255 a jak nie to spoko nic ok
     //i jak nie ma przeniesienia [0] = 0 to erase like
    
-    return TC(newNumber, leastSignificant); 
+    return newTC; 
 }
     
 
@@ -240,11 +256,14 @@ TC TC::add(TC& number1, TC& number2){
     vectorAdd(&newNumber[index], &number1._number[0], number1._number.size()-1);
     tempLS = mostSignificant;
     index = 1;
+    std::cout <<(int) newNumber[2];
+    std::cout << (int) number2._number[1];
     while(mostSignificantNumber2/ 8 != tempLS / 8){
         tempLS -= 8;
         index++;
     }
     vectorSub(&newNumber[index], &number2._number[0], number2._number.size()-1);
+
     //sprawdzenie która większa ujemna czy dodatnia spoko //analogia coś do dodawania
     //jeśli ujemna i przepełnienie to zmieniamy 1 na 255 a jak nie to spoko nic ok
     //i jak nie ma przeniesienia [0] = 0 to erase like
@@ -261,10 +280,37 @@ TC TC::add(TC& number1, TC& number2){
        vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i + 1);
        }
     //tu też manipulacja 1 znakiem
-    return TC(newNumber, leastSignificant); 
+    TC tc(newNumber, leastSignificant);
+    if((number1._number[0] > 127 && number2._number[0] < 127) || (number1._number[0] < 127 && number2._number[0] > 127))
+        negateBits(tc); 
+    return  tc;
 }
 
 TC TC::div(TC& number1, TC& number2){
     vector<uint8_t> quotient;
     return TC(quotient , 0);
+}
+
+bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNumber1, unsigned int mostSignificantNumber2){
+    if(mostSignificantNumber1 / 8 > mostSignificantNumber2 / 8){
+        return true;
+    } else if (mostSignificantNumber1 / 8 < mostSignificantNumber2 / 8){
+        return false;
+    }
+
+    negateBits(number1  );
+
+    for(int i = 0; i < number1._number.size() && i < number2._number.size(); i++){
+        if(number1._number[i] > number2._number[i]){
+            return true;
+        } else if(number1._number[i] < number2._number[i]){
+            return false;
+        }
+    }
+
+    if(number1._number.size() <= number2._number.size()){
+        return false;
+    } 
+
+    return true;
 }

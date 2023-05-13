@@ -17,6 +17,7 @@ private:
     vector<uint8_t> _number;
     
     static void setNegative(uint8_t& byt, int n); //ustawia reszte bitów na 1 w liczbie (00000001) -> (11111111) tylko w wypadku jak jest ujemna
+    static bool isNegativeBigger(TC a, TC b, unsigned int c, unsigned int d);
 
 public:
     int _position; // na prywatne potem
