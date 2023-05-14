@@ -239,7 +239,7 @@ TC TC::add(TC number1, TC number2){
 }
     
 
- TC TC::sub(TC& number1, TC& number2){
+ TC TC::sub(TC number1, TC number2){
    
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
@@ -287,7 +287,7 @@ TC TC::add(TC number1, TC number2){
     return newTC; 
 }
 
- TC TC::mul(TC& number1, TC& number2){
+ TC TC::mul(TC number1, TC number2){
    
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
     int number3Size = number1._number.size() + number2._number.size(); 
@@ -303,9 +303,54 @@ TC TC::add(TC number1, TC number2){
     return  tc;
 }
 
-TC TC::div(TC& number1, TC& number2){
-    vector<uint8_t> quotient;
-    return TC(quotient , 0);
+TC TC::div(TC number1, TC number2){
+   
+    if(number1._position < 0 || number2._position < 0){
+        number1._position += 8;
+        number2._position += 8;
+        if(number1._position > 7){
+            number1._number.push_back(0);
+        }
+        if(number2._position > 7){
+            number2._number.push_back(0);
+        }
+    }
+     vector<uint8_t> quotient(number1._number.size() + 1);
+    vector<uint8_t> remainder(number1._number.size() + 1);
+    unsigned int power;
+    bool negative;
+    int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
+    uint8_t one = 1;
+    
+
+    if (number1._number[0] > 127 && number2._number[0] > 127){
+        negateBits(number1);
+        negateBits(number2);
+    } else if(number1._number[0] < 127 && number2._number[0] > 127){
+        negateBits(number2);
+        negative = true;
+    } else if(number1._number[0] > 127 && number2._number[0] < 127){
+        negateBits(number1);
+        negative = true;
+    } 
+            printTC(number1);
+
+   /* while(true){
+        remainder = number1._number;
+        TC number3 = sub(number1, number2);
+        std::cout << std::endl;
+        printTC(number1);
+        std::cout << std::endl;
+        std::cout << (int) number1._number[1] << std::endl;
+        if( number3._number[0] > 127){
+            break;
+        } else {
+            number3._number.erase(number3._number.begin());
+            number1._number = number3._number;
+        }
+        vectorAdd(&quotient[quotient.size() - 1], &one, 0);
+    }*/
+  return TC (quotient, 0);   
 }
 
 bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNumber1, unsigned int mostSignificantNumber2){
@@ -315,7 +360,7 @@ bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNu
         return false;
     }
 
-    negateBits(number1  );
+    negateBits(number1 );
 
     for(int i = 0; i < number1._number.size() && i < number2._number.size(); i++){
         if(number1._number[i] > number2._number[i]){
@@ -331,3 +376,4 @@ bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNu
 
     return true;
 }
+
