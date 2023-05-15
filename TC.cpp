@@ -196,19 +196,21 @@ TC TC::add(TC number1, TC number2){
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
-                           mostSignificantNumber1 : mostSignificantNumber2; 
+                           mostSignificantNumber1 : mostSignificantNumber2;
     int number3Size = ((mostSignificant - leastSignificant) + 9) / 8 ; 
     vector<uint8_t> newNumber(number3Size);
     TC newTC(newNumber, leastSignificant);
     int tempLS = mostSignificant;
     unsigned int index1 = 1, index2 = 1;
 
-    while(mostSignificantNumber1/ 8 != tempLS / 8){
+    changeIndex(mostSignificantNumber1, tempLS);
+    while(mostSignificantNumber1 != tempLS){
         tempLS -= 8;
         index1++;
     }
     tempLS = mostSignificant;
-    while(mostSignificantNumber2/ 8 != tempLS / 8){
+    changeIndex(mostSignificantNumber2, tempLS);
+    while(mostSignificantNumber2 != tempLS){
         tempLS -= 8;
         index2++;
     }
@@ -217,23 +219,33 @@ TC TC::add(TC number1, TC number2){
         vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         vectorSub(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
         negateBits(newTC);
-
+        negateBits(number1);
+        
     } else if(number1._number[0] < 127 && number2._number[0] > 127){
         negateBits(number2);
         vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
         vectorSub(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         negateBits(newTC);
+        negateBits(number2);
     } else if(number1._number[0] > 127 && number2._number[0] > 127){
         negateBits(number1);
         negateBits(number2);
         vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
         negateBits(newTC);
+        negateBits(number1);
+        negateBits(number2);
 
     } else {
         vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
     } 
+
+    if(newTC._number[1] > 127 && newTC._number[0] > 127){
+            newTC._number.erase(newTC._number.begin());
+    } else if(newTC._number[1] < 128 && newTC._number[0] == 0) {
+            newTC._number.erase(newTC._number.begin());
+    }
     
     return newTC; 
 }
@@ -251,13 +263,14 @@ TC TC::add(TC number1, TC number2){
     TC newTC(newNumber, leastSignificant);
     int tempLS = mostSignificant;
     unsigned int index1 = 1, index2 = 1;
-
-    while(mostSignificantNumber1/ 8 != tempLS / 8){
+    changeIndex(mostSignificantNumber1, tempLS);
+    while(mostSignificantNumber1 != tempLS){
         tempLS -= 8;
         index1++;
     }
     tempLS = mostSignificant;
-    while(mostSignificantNumber2/ 8 != tempLS / 8){
+    changeIndex(mostSignificantNumber2, tempLS);
+    while(mostSignificantNumber2 != tempLS){
         tempLS -= 8;
         index2++;
     }
@@ -282,7 +295,11 @@ TC TC::add(TC number1, TC number2){
         vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         vectorSub(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
     } 
-
+    if(newTC._number[1] > 127 && newTC._number[0] > 127){
+            newTC._number.erase(newTC._number.begin());
+    } else if(newTC._number[1] < 128 && newTC._number[0] == 0) {
+            newTC._number.erase(newTC._number.begin());
+    }
   
     return newTC; 
 }
@@ -297,60 +314,75 @@ TC TC::add(TC number1, TC number2){
        vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i + 1);
        }
     //tu też manipulacja 1 znakiem
-    TC tc(newNumber, leastSignificant);
+    TC newTC(newNumber, leastSignificant);
     if((number1._number[0] > 127 && number2._number[0] < 127) || (number1._number[0] < 127 && number2._number[0] > 127))
-        negateBits(tc); 
-    return  tc;
+        negateBits(newTC); 
+
+    if(newTC._number[1] > 127 && newTC._number[0] > 127){
+            newTC._number.erase(newTC._number.begin());
+    } else if(newTC._number[1] < 128 && newTC._number[0] == 0) {
+            newTC._number.erase(newTC._number.begin());
+    }    
+    return  newTC;
 }
 
-TC TC::div(TC number1, TC number2){
+void TC::div(TC number1, TC number2){
    
     if(number1._position < 0 || number2._position < 0){
         number1._position += 8;
         number2._position += 8;
         if(number1._position > 7){
             number1._number.push_back(0);
+             number1._position = 0;
         }
         if(number2._position > 7){
             number2._number.push_back(0);
+            number2._position = 0;
         }
     }
-     vector<uint8_t> quotient(number1._number.size() + 1);
-    vector<uint8_t> remainder(number1._number.size() + 1);
+    vector<uint8_t> quotient(number1._number.size());
+    vector<uint8_t> remainder(number1._number.size());
     unsigned int power;
     bool negative;
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     uint8_t one = 1;
-    
+    printTC(number1);
+            std::cout << std::endl; 
+            std::cout << number1._position;
+        std::cout << std::endl; 
 
-    if (number1._number[0] > 127 && number2._number[0] > 127){
-        negateBits(number1);
-        negateBits(number2);
-    } else if(number1._number[0] < 127 && number2._number[0] > 127){
-        negateBits(number2);
+    printTC(number2);
+        std::cout << std::endl; 
+         std::cout << number2._position;
+        std::cout << std::endl; 
+        std::cout << std::endl; 
+
+     if(number1._number[0] < 127 && number2._number[0] > 127){
+
         negative = true;
     } else if(number1._number[0] > 127 && number2._number[0] < 127){
-        negateBits(number1);
+        
         negative = true;
     } 
-            printTC(number1);
-
-   /* while(true){
+    TC number3;
+    int n = 0;
+    while(true){
         remainder = number1._number;
-        TC number3 = sub(number1, number2);
-        std::cout << std::endl;
-        printTC(number1);
-        std::cout << std::endl;
-        std::cout << (int) number1._number[1] << std::endl;
+        number3 = sub(number1, number2);
+        printTC(number3);
+        std::cout << std::endl; 
         if( number3._number[0] > 127){
             break;
         } else {
-            number3._number.erase(number3._number.begin());
             number1._number = number3._number;
+            vectorAdd(&quotient[quotient.size() - 1], &one, 0);
         }
-        vectorAdd(&quotient[quotient.size() - 1], &one, 0);
-    }*/
-  return TC (quotient, 0);   
+        n++;
+    }
+
+std::cout << "Quotient = "; printVector(quotient);
+std::cout << std::endl;
+std::cout << "Reminder = "; printVector(remainder);
 }
 
 bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNumber1, unsigned int mostSignificantNumber2){
@@ -360,7 +392,7 @@ bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNu
         return false;
     }
 
-    negateBits(number1 );
+    negateBits(number1);
 
     for(int i = 0; i < number1._number.size() && i < number2._number.size(); i++){
         if(number1._number[i] > number2._number[i]){
@@ -377,3 +409,24 @@ bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNu
     return true;
 }
 
+void TC::printVector(const vector<uint8_t>&  number){
+    for(int i = 0; i < number.size(); i++){
+        for (int j = 7; j >= 0; j--) {
+            std::cout << ((number[i] >> j) & 1);
+        }
+    }
+}
+
+void TC::changeIndex(int& a, int& b){
+    int modA = a % 8;
+    if(a < 0)
+        a = a - modA -1;
+    else
+        a = a + 7 - modA;
+       
+    int modB = b % 8;
+    if(b < 0)
+        b = b - modB -1;
+    else 
+        b = b + 7 - modB;
+}

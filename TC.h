@@ -18,6 +18,7 @@ private:
     int _position; 
     static void setNegative(uint8_t& byt, int n); //ustawia reszte bitów na 1 w liczbie (00000001) -> (11111111) tylko w wypadku jak jest ujemna
     static bool isNegativeBigger(TC a, TC b, unsigned int c, unsigned int d);
+    static void printVector(const vector<uint8_t>& number);
 
 public:
    
@@ -32,12 +33,13 @@ public:
     static TC add(TC number1, TC number2);
     static TC sub(TC number1, TC number2);
     static TC mul(TC number1, TC number2);
-    static TC div(TC number1, TC number2);
+    static void div(TC number1, TC number2);
     TC& operator=(const TC& other) { 
         _number = other._number;
         _position = other._position;
     return *this;
-}
+    }
+    static void changeIndex(int& a, int& b);
 
 };
 #endif
