@@ -15,7 +15,7 @@ vector_add:
   jnc end
 carry:
   dec %ecx
-  decb (%ecx)
+  incb (%ecx)
   je carry  
 end:
   popl %edi

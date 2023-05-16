@@ -245,6 +245,8 @@ TC TC::add(TC number1, TC number2){
             newTC._number.erase(newTC._number.begin());
     } else if(newTC._number[1] < 128 && newTC._number[0] == 0) {
             newTC._number.erase(newTC._number.begin());
+    } else if(isNumberZero(number1) && number2._number[0] < 127){
+        newTC._number.erase(newTC._number.begin());
     }
     
     return newTC; 
@@ -299,8 +301,10 @@ TC TC::add(TC number1, TC number2){
             newTC._number.erase(newTC._number.begin());
     } else if(newTC._number[1] < 128 && newTC._number[0] == 0) {
             newTC._number.erase(newTC._number.begin());
+    } else if(isNumberZero(number1) && number2._number[0] < 127){
+        newTC._number.erase(newTC._number.begin());
     }
-  
+
     return newTC; 
 }
 
@@ -313,16 +317,11 @@ TC TC::add(TC number1, TC number2){
     for (int i = number2._number.size() - 1; i >= 0; i--) {
        vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i + 1);
        }
-    //tu też manipulacja 1 znakiem
     TC newTC(newNumber, leastSignificant);
     if((number1._number[0] > 127 && number2._number[0] < 127) || (number1._number[0] < 127 && number2._number[0] > 127))
         negateBits(newTC); 
 
-    if(newTC._number[1] > 127 && newTC._number[0] > 127){
-            newTC._number.erase(newTC._number.begin());
-    } else if(newTC._number[1] < 128 && newTC._number[0] == 0) {
-            newTC._number.erase(newTC._number.begin());
-    }    
+    
     return  newTC;
 }
 
@@ -346,26 +345,17 @@ void TC::div(TC number1, TC number2){
     bool negative;
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     uint8_t one = 1;
-    printTC(number1);
-            std::cout << std::endl; 
-            std::cout << number1._position;
-        std::cout << std::endl; 
-
-    printTC(number2);
-        std::cout << std::endl; 
-         std::cout << number2._position;
-        std::cout << std::endl; 
-        std::cout << std::endl; 
-
      if(number1._number[0] < 127 && number2._number[0] > 127){
-
+        negateBits(number2);
         negative = true;
     } else if(number1._number[0] > 127 && number2._number[0] < 127){
-        
+        negateBits(number1);
         negative = true;
-    } 
+    } else if (number1._number[0] > 127 && number2._number[0] > 127){
+         negateBits(number1);
+        negateBits(number2);
+    }
     TC number3;
-    int n = 0;
     while(true){
         remainder = number1._number;
         number3 = sub(number1, number2);
@@ -377,7 +367,6 @@ void TC::div(TC number1, TC number2){
             number1._number = number3._number;
             vectorAdd(&quotient[quotient.size() - 1], &one, 0);
         }
-        n++;
     }
 
 std::cout << "Quotient = "; printVector(quotient);
