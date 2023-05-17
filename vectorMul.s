@@ -11,13 +11,14 @@ vectorMul:
     movl 16(%ebp), %edx    # trzecia
     movl 20(%ebp), %edi     #rozmiar pierwsze
     movl 24(%ebp), %ebp #petla
+
     movl %edi, %esi
     add %ebp, %esi
     movb (%ecx), %cl
     
     mul:
     movb (%ebx, %edi), %al
-    mulb %cl
+    imulb %cl
     clc 
     adcb %al, (%edx, %esi)
     dec %esi

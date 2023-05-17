@@ -318,9 +318,6 @@ TC TC::add(TC number1, TC number2){
        vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i + 1);
        }
     TC newTC(newNumber, leastSignificant);
-    if((number1._number[0] > 127 && number2._number[0] < 127) || (number1._number[0] < 127 && number2._number[0] > 127))
-        negateBits(newTC); 
-
     
     return  newTC;
 }
