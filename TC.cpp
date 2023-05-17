@@ -313,11 +313,28 @@ TC TC::add(TC number1, TC number2){
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
     int number3Size = number1._number.size() + number2._number.size(); 
     vector<uint8_t> newNumber(number3Size);
+    bool negate = false;
+    if(number1._number[0] > 127 && number2._number[0] > 127){
+        negateBits(number1);
+        negateBits(number2);
+    }
+    else if (number1._number[0] > 127 && number2._number[0] < 127){
+        negateBits(number1);
+        negate = true;
+    }
+    else if (number1._number[0] < 127 && number2._number[0] > 127){
+        negateBits(number2);
+        negate = true;
+    }
 
     for (int i = number2._number.size() - 1; i >= 0; i--) {
        vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i + 1);
-       }
+    }
     TC newTC(newNumber, leastSignificant);
+    
+    if(negate){
+        negateBits(newTC);
+    }
     
     return  newTC;
 }

@@ -18,7 +18,7 @@ vectorMul:
     
     mul:
     movb (%ebx, %edi), %al
-    imulb %cl
+    mulb %cl
     clc 
     adcb %al, (%edx, %esi)
     dec %esi
