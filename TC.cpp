@@ -30,7 +30,7 @@ TC::TC(vector<uint8_t>& number, int position) {
         uint8_t shiftL;
         int fract = position - 1 + number.size() * 8;
         vector<uint8_t> shiftNumber(number.size() + 1);
-        if (position < 0) { // wypadek gdy pozycja jest ujemna
+        if (position < 0) { 
             shiftR = -position % 8;
             shiftL = 8 - shiftR;
             for (int i = number.size(); i > 0; i--) {
@@ -39,7 +39,7 @@ TC::TC(vector<uint8_t>& number, int position) {
             }
             if (number[0] > 127 && fract > 0) {
                 setNegative(shiftNumber[0], shiftR);
-            } 
+            }
         }
         else {
             shiftL = position % 8;
@@ -52,6 +52,11 @@ TC::TC(vector<uint8_t>& number, int position) {
                 setNegative(shiftNumber[0], shiftR);
             }
         }
+        if(shiftNumber[0] == 0 && shiftNumber[1] < 128)
+            shiftNumber.erase(shiftNumber.begin());
+        else if(shiftNumber[0] == 255 && shiftNumber[1] > 127)
+            shiftNumber.erase(shiftNumber.begin());
+        changeIndex2(position);
         _number = shiftNumber;
         _position = position;
     }
@@ -119,66 +124,79 @@ void TC::setNegative(uint8_t& number, int n) //do wywalenia po prostu = xd
 /// Wypisuje naszą liczbę w U2
 /// </summary>
 /// <param name="number">Liczba do wypisania</param>
-void TC::printTC(TC& number) // nie działa XD
+std::string TC::printTC(TC number) 
 {
-    if (number._position >= 0) { //dla pozycji nieujemnych
+    std::string numb = "";
+    int mostSignificant = (number._position + number._number.size() * 8);
+    if (number._position == 0) { //dla pozycji nieujemnych
         for (int i = 0; i < number._number.size(); i++) {
             for (int j = 7; j >= 0; j--) {
-                std::cout << ((number._number[i] >> j) & 1);
+                numb += std::to_string(((number._number[i] >> j) & 1));
             }
         }
+        return numb;
     }
-    else{  //pozycja ujemna
-        int comma;
-        int size = number._number.size() * 8 - 8 + number._position;
-        if ( size < 0) { //warunki gdy najstarszy bit jest na ujemnej
-            comma = number._position + number._number.size() * 8;
-            if (number._position % 8 == 0) { //gdy  jest co pełny bajt 
+    else if (number._position > 7) {
+        for (int i = 0; i < number._number.size(); i++) {
+            for (int j = 7; j >= 0; j--) {
+                numb += std::to_string(((number._number[i] >> j) & 1));
+            }
+        }
+        while (number._position != 0) {
+            for (int i = 0; i < 8; i++)
+                numb += "0";
+            number._position -= 8;
+        }
+        return numb;
+    }
+    else if (number._position < 0 && mostSignificant > 0) {
 
-                if (comma == 0) {
-                    std::cout << 0;
-                }
-                for (int i = 0; i < number._number.size(); i++) {
-                    for (int j = 7; j >= 0; j--) {
-                        if (comma == 0) {
-                            std::cout << ',';
-                        }
-                        std::cout << ((number._number[i] >> j) & 1);
-                        comma--;
-                    }
-
-                }
-           }
-           else { //gdy trzeba 0 dopisywać bo większa niż -1
-                std::cout << "0,";
-                while (comma < 0) {
-                    for (int j = 7; j >= 0; j--) {
-                        std::cout << 0;
-                    }
-                    comma += 8;
-                }
-                for (int i = 0; i < number._number.size(); i++) {
-                    for (int j = 7; j >= 0; j--) {
-                        std::cout << ((number._number[i] >> j) & 1);
-                    }
-                }
-           }
-        } 
-        else {// gdy najstarszy jest na dodatniej
-            comma = number._number.size() * 8 - 8;
-            for (int i = 0; i < number._number.size(); i++) {
+        int comma = number._position + number._number.size() * 8;
+        int size = number._number.size();
+        int i = 0;
+        while (true) {
+            for (i; i < size; i++) {
                 for (int j = 7; j >= 0; j--) {
-                    
-                    std::cout << ((number._number[i] >> j) & 1);
+                    numb += std::to_string(((number._number[i] >> j) & 1));
                 }
                 comma -= 8;
                 if (comma == 0) {
-                    std::cout << ',';
-                }
+                    i++;
+                    break;              
+                }      
+            }
+            break;
+        }
+        numb += ",";
+        for (i; i < size; i++) {
+            for (int j = 7; j >= 0; j--) {
+                numb += std::to_string(((number._number[i] >> j) & 1));
             }
         }
-        
-         
+        return numb;
+    }
+    else if (number._position < 0 && mostSignificant == 0) {
+        numb += "0,";
+        for (int i = 0; i < number._number.size(); i++) {
+            for (int j = 7; j >= 0; j--) {
+                numb += std::to_string(((number._number[i] >> j) & 1));
+            }
+        }
+        return numb;
+    }
+    else {
+        mostSignificant = -mostSignificant;
+        numb += "0.";
+        while (mostSignificant != 0) {
+            numb +=  "0";
+            mostSignificant--;
+        }
+        for (int i = 0; i < number._number.size(); i++) {
+            for (int j = 7; j >= 0; j--) {
+                numb += std::to_string(((number._number[i] >> j) & 1));
+            }
+        }
+        return numb;
     }
 }
 
@@ -422,4 +440,12 @@ void TC::changeIndex(int& a, int& b){
         b = b - modB -1;
     else 
         b = b + 7 - modB;
+}
+
+void TC::changeIndex2(int& a) {
+    int modA = a % 8;
+    if (a > 0)
+        a = a - modA;
+    else
+        a = a - 8 - modA;
 }
