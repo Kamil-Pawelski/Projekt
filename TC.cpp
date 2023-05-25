@@ -183,11 +183,16 @@ void TC::printTC(TC& number) // nie działa XD
 }
 
 void TC::negateBits(TC& number){
+   
     for(int i = 0; i < number._number.size(); i++){
        number._number[i] = ~(number._number[i]);
     } 
     uint8_t one = 1;
     vectorAdd(&number._number[number._number.size() - 1], &one, 0);
+}
+void TC::negateIntegerBits(TC& number){
+
+
 }
 
 TC TC::add(TC number1, TC number2){
@@ -271,19 +276,17 @@ TC TC::add(TC number1, TC number2){
     }
         if (number1._number[0] > 127 && number2._number[0] < 127) {
         negateBits(number1);
-        vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
+        vectorSub(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
         vectorSub(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
     } else if(number1._number[0] < 127 && number2._number[0] > 127){
         negateBits(number2);
         vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
-        vectorSub(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
+        vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
     } else if(number1._number[0] > 127 && number2._number[0] > 127){
         negateBits(number1);
         negateBits(number2);
-        vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
-        negateBits(newTC);
-
+        vectorSub(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
     } else {
         vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         vectorSub(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
@@ -301,8 +304,7 @@ TC TC::add(TC number1, TC number2){
  TC TC::mul(TC number1, TC number2){
    
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
-    int number3Size = number1._number.size() + number2._number.size(); 
-    vector<uint8_t> newNumber(number3Size);
+    vector<uint8_t> newNumber(number1._number.size() + number2._number.size());
     bool negate = false;
     if(number1._number[0] > 127 && number2._number[0] > 127){
         negateBits(number1);
@@ -315,10 +317,10 @@ TC TC::add(TC number1, TC number2){
     else if (number1._number[0] < 127 && number2._number[0] > 127){
         negateBits(number2);
         negate = true;
-    }
+    } 
 
     for (int i = number2._number.size() - 1; i >= 0; i--) {
-       vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i + 1);
+       vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i+1);
     }
     TC newTC(newNumber, leastSignificant);
     

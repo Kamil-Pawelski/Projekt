@@ -30,6 +30,7 @@ public:
     static uint8_t leftShift(const uint8_t& number, int n); 
     static void printTC(TC& number);
     static void negateBits(TC& number);
+    static void negateIntegerBits(TC& number);
     static TC add(TC number1, TC number2);
     static TC sub(TC number1, TC number2);
     static TC mul(TC number1, TC number2);
