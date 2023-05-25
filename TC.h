@@ -16,8 +16,8 @@ class TC {
 private:
     vector<uint8_t> _number;
     int _position; 
-    static void setNegative(uint8_t& byt, int n); //ustawia reszte bitów na 1 w liczbie (00000001) -> (11111111) tylko w wypadku jak jest ujemna
-    static bool isNegativeBigger(TC a, TC b, unsigned int c, unsigned int d);
+    static void setNegative(uint8_t& byt, int n);  //do usuniecia
+    static bool isNegativeBigger(TC a, TC b, unsigned int c, unsigned int d); //do usuniecia
     static void printVector(const vector<uint8_t>& number);
 
 public:
@@ -25,21 +25,21 @@ public:
     TC();
     TC(vector<uint8_t>& number, int position);
     static vector<uint8_t> getNumber(TC number);
-    static bool isNumberZero(TC number); //sprawdza czy zero
-    static uint8_t rightShift(const uint8_t& number, int n); // Zobaczymy może dam do prywatnych? //przesunięcia
-    static uint8_t leftShift(const uint8_t& number, int n); // tak samo jak wyżej
+    static bool isNumberZero(TC number); 
+    static uint8_t rightShift(const uint8_t& number, int n); 
+    static uint8_t leftShift(const uint8_t& number, int n); 
     static void printTC(TC& number);
     static void negateBits(TC& number);
     static TC add(TC number1, TC number2);
     static TC sub(TC number1, TC number2);
     static TC mul(TC number1, TC number2);
     static void div(TC number1, TC number2);
+    static void changeIndex(int& a, int& b);
     TC& operator=(const TC& other) { 
         _number = other._number;
         _position = other._position;
     return *this;
     }
-    static void changeIndex(int& a, int& b);
-
+    
 };
 #endif

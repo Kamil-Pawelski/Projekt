@@ -1,37 +1,30 @@
 #include <iostream>
 #include "TC.h"
 
-extern "C" void vectorDiv( uint8_t *a, uint8_t *b, uint8_t *c);
-
 int main(){
 
-vector <uint8_t> ab = {0b10000101,0b10000001, 0b10000100}; //126
-vector<uint8_t> ac = {0b00000010};
+vector<uint8_t> ab = {0b11111111,0b10000010}; 
+vector<uint8_t> ac = {1}; 
  uint8_t result = 0;
  std::cout << std::endl;
- TC a(ab,0);
+ TC a(ab,-8);
  TC b(ac,0);
-TC add = TC::add(a,b);
-
- TC sub = TC::mul(a,b);
-
-//TC::div(a,b);
-TC::printTC(a);
-std::cout << std::endl;
-
-
-//TC add = TC::add(a,b);
+ //TC::div(a,b);
+// TC mul = TC::mul(a,b);
+ //TC sub = TC::sub(a,b);
+ TC add = TC::sub(a,b);
 
 std::cout << std::endl;
 std::cout << "add = ";
 TC::printTC(add);
 std::cout << std::endl;
 
-std::cout << "mul = ";
-TC::printTC(sub);
+std::cout << "sub = ";
+//TC::printTC(sub);
 std::cout << std::endl;
 
-//TC::printTC(sub);
+std::cout << "mul = ";
+//TC::printTC(mul);
 std::cout << std::endl;
 return 0;
 }
