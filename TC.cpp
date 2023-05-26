@@ -91,7 +91,7 @@ uint8_t TC::leftShift(const uint8_t& number, int n)
 /// </summary>
 /// <param name="byt">Liczba do zamiany</param>
 /// <param name="n">Liczba 1 do dopisania</param>
-void TC::setNegative(uint8_t& number, int n) //do wywalenia po prostu = xd
+void TC::setNegative(uint8_t& number, int n) 
 {
     switch (n) {
     case 1:
@@ -208,11 +208,25 @@ void TC::negateBits(TC& number){
     uint8_t one = 1;
     vectorAdd(&number._number[number._number.size() - 1], &one, 0);
 }
+
 void TC::negateIntegerBits(TC& number){
-
-
+int mostSignificant = number._position - 1 + (number._number.size() * 8);  
+if(mostSignificant > 0){
+        unsigned int size = number._number.size() - 1;
+        int tempPos = number._position;
+        uint8_t one = 1;
+        if(tempPos < 0){
+        while(tempPos != 0){
+            size--;
+            tempPos += 8;
+        }
+        }
+        for(int i = 0; i <= size; i++){
+            number._number[i] = ~(number._number[i]);
+        }
+        vectorAdd(&number._number[size], &one, 0); 
 }
-
+}
 TC TC::add(TC number1, TC number2){
 
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
@@ -226,32 +240,30 @@ TC TC::add(TC number1, TC number2){
     int tempLS = mostSignificant;
     unsigned int index1 = 1, index2 = 1;
 
-    changeIndex(mostSignificantNumber1, tempLS);
     while(mostSignificantNumber1 != tempLS){
         tempLS -= 8;
         index1++;
     }
     tempLS = mostSignificant;
-    changeIndex(mostSignificantNumber2, tempLS);
     while(mostSignificantNumber2 != tempLS){
         tempLS -= 8;
         index2++;
     }
     if (number1._number[0] > 127 && number2._number[0] < 127 && mostSignificantNumber1 >= 0) {
-        negateBits(number1);
+        negateIntegerBits   (number1);
         vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
         vectorSub(&newTC._number[index1], &number1._number[0], number1._number.size()-1);        
     } else if(number1._number[0] < 127 && number2._number[0] > 127){
-        negateBits(number2);
+        negateIntegerBits(number2);
         vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         vectorSub(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
        // negateBits(newTC);
     } else if(number1._number[0] > 127 && number2._number[0] > 127){
-        negateBits(number1);
-        negateBits(number2);
-        vectorSub(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
-        vectorSub(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
-        //negateBits(newTC);
+        negateIntegerBits(number1);
+        negateIntegerBits(number2);
+        vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
+        vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
+        negateIntegerBits(newTC);
     } else {
         vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
@@ -281,28 +293,27 @@ TC TC::add(TC number1, TC number2){
     TC newTC(newNumber, leastSignificant);
     int tempLS = mostSignificant;
     unsigned int index1 = 1, index2 = 1;
-    changeIndex(mostSignificantNumber1, tempLS);
     while(mostSignificantNumber1 != tempLS){
         tempLS -= 8;
         index1++;
     }
     tempLS = mostSignificant;
-    changeIndex(mostSignificantNumber2, tempLS);
     while(mostSignificantNumber2 != tempLS){
         tempLS -= 8;
         index2++;
     }
-        if (number1._number[0] > 127 && number2._number[0] < 127) {
-        negateBits(number1);
-        vectorSub(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
-        vectorSub(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
+    if (number1._number[0] > 127 && number2._number[0] < 127) {
+        negateIntegerBits(number1);
+        vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
+        vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
+        negateIntegerBits(newTC);
     } else if(number1._number[0] < 127 && number2._number[0] > 127){
-        negateBits(number2);
+        negateIntegerBits(number2);
         vectorAdd(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
         vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
     } else if(number1._number[0] > 127 && number2._number[0] > 127){
-        negateBits(number1);
-        negateBits(number2);
+        negateIntegerBits(number1);
+        negateIntegerBits(number2);
         vectorAdd(&newTC._number[index2], &number2._number[0], number2._number.size()-1);
         vectorSub(&newTC._number[index1], &number1._number[0], number1._number.size()-1);
     } else {
@@ -325,25 +336,25 @@ TC TC::add(TC number1, TC number2){
     vector<uint8_t> newNumber(number1._number.size() + number2._number.size());
     bool negate = false;
     if(number1._number[0] > 127 && number2._number[0] > 127){
-        negateBits(number1);
-        negateBits(number2);
+        negateIntegerBits(number1);
+        negateIntegerBits(number2);
     }
     else if (number1._number[0] > 127 && number2._number[0] < 127){
-        negateBits(number1);
+        negateIntegerBits(number1);
         negate = true;
     }
     else if (number1._number[0] < 127 && number2._number[0] > 127){
-        negateBits(number2);
+        negateIntegerBits(number2);
         negate = true;
     } 
 
     for (int i = number2._number.size() - 1; i >= 0; i--) {
-       vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i+1);
+       vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i);
     }
     TC newTC(newNumber, leastSignificant);
     
     if(negate){
-        negateBits(newTC);
+        negateIntegerBits(newTC);
     }
     
     return  newTC;
