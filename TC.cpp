@@ -367,30 +367,57 @@ void TC::div(TC number1, TC number2){
             number1._position -= 8;
         }
     }    
-    int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8)) - 8;
+    int mostSignificantNumber1 = (number1._position - 9 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
+    
     if(mostSignificantNumber1 < mostSignificantNumber2){
         while(mostSignificantNumber1 != mostSignificantNumber2)
-        if(number1._number[0] > 127)
-            number1._number.instert(number1._number.begin(), 255);
-        else
-            number1._number.instert(number1._number.begin(), 0);
-        mostSignificantNumber1 += 8;
+        {
+            if(number1._number[0] > 127)
+                number1._number.insert(number1._number.begin(), 255);
+            else
+                number1._number.insert(number1._number.begin(), 0);
+            mostSignificantNumber1 += 8;
+        }
+
     }
-    unsigned int loop = (number2._position - 1 + (number2._number.size() * 8)) - (number2._position - 1 + (number2._number.size() * 8));
+    unsigned int loop = number1._number.size()- number2._number.size() ;
     vector<uint8_t> result(number1._number.size()); //tu wymik
-    vector<uint8_t> loopResult(number2.size());
+    vector<uint8_t> loopResult(number2._number.size());
     vector<uint8_t> numberA(number1._number.begin(), number1._number.begin() + number2._number.size()); //tu liczba number1 przesuwana
+    unsigned int size = number2._number.size(); 
+    TC number (numberA, number2._position);
+    TC loopResult2(loopResult, number2._position);
+    std::cout <<"Looprestult2 przed  " << printTC(number) << std::endl;
+    std::cout <<"Looprestult2  number 2 " << printTC(number2) << std::endl;
     
-    loopResult = vectorSub(number, number2)
-    if(loopResult[0] > 127 && number2._number[0] < 128 || loopResult[0] < 127 && number2._number[0] > 128){
+    loopResult2 = sub(number, number2);
+    std::cout <<"Looprestult2  " << printTC(loopResult2) << std::endl;
+    if((loopResult2._number[0] > 127 && number2._number[0] < 128) || (loopResult2._number[0] < 128 && number2._number[0] > 127)){
         result[0] = 0;
     } else {
+        std::cout << "tutaj";
         result[0] = 1;
     }
 
-    
-    if(number1._number[0] < 127 && number2._number[0] < 127){
+    printVector(result);
+    std::cout << std::endl << printTC(loopResult2) << std::endl;
+    std::cout <<"loop = " << loop << std::endl;
+    for(loop; loop > 0; loop--){
+        for(int i = 0; i <= 7; i++){
+            shiftDiv(loopResult2._number, number1._number[size]);
+            if((loopResult2._number[0] > 127 && number2._number[0] < 128) || (loopResult2._number[0] < 128 && number2._number[0] > 127 )){
+                loopResult2 = sub(number, number2);
+            }
+        }
+            std::cout << loop << std::endl;
+
+    }
+    TC result2(result, 0);
+    //TC mulResult = mul(result2, number2);
+    //std::cout << printTC(mulResult) << std::endl;
+    //if mnozenie razy to bedzie rowne to nic jak nie to 
+   /* if(number1._number[0] < 127 && number2._number[0] < 127){
         negateIntegerBits(number1);
         negateIntegerBits(number2);
     }
@@ -401,7 +428,7 @@ void TC::div(TC number1, TC number2){
     else if (number1._number[0] < 127 && number2._number[0] > 127){
         negateIntegerBits(number1);
         negate = true;
-    } 
+    } */
 }
 
 bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNumber1, unsigned int mostSignificantNumber2){
@@ -456,4 +483,20 @@ void TC::changeIndex2(int& a) {
         a = a - modA;
     else
         a = a - 8 - modA;
+}
+
+void TC::shiftDiv(std::vector<uint8_t>& vec, uint8_t& value) {
+    for (int i = 0; i < vec.size() - 1; i++) {
+
+        uint8_t new_carry = (vec[i+1] >> 7) & 1;  
+        vec[i+1] = (vec[i+1] << 1);
+        std::cout << (int)new_carry << std::endl;
+        vec[i] = (vec[i] << 1);  
+        std::cout << (int) vec[i] << std::endl; 
+        vec[i] = vec[i] + new_carry; 
+    }
+    uint8_t carry = (value >> 7) & 1;
+    value = value << 1;
+    vec[vec.size() - 1] += carry;
+
 }

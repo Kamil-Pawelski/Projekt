@@ -37,6 +37,7 @@ public:
     static void div(TC number1, TC number2);
     static void changeIndex(int& a, int& b);
     static void changeIndex2(int& a);
+    static void shiftDiv(vector<uint8_t>& a, uint8_t& b);
     TC& operator=(const TC& other) {
         _number = other._number;
         _position = other._position;
