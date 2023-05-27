@@ -361,50 +361,47 @@ TC TC::add(TC number1, TC number2){
 }
 
 void TC::div(TC number1, TC number2){
-   
-    if(number1._position < 0 || number2._position < 0){
-        number1._position += 8;
-        number2._position += 8;
-        if(number1._position > 7){
-            number1._number.push_back(0);
-             number1._position = 0;
-        }
-        if(number2._position > 7){
+    if(number1._position > number2._position){
+        while(number1._position != number2._position){
             number2._number.push_back(0);
-            number2._position = 0;
+            number1._position -= 8;
         }
-    }
-    vector<uint8_t> quotient(number1._number.size());
-    vector<uint8_t> remainder;
-    unsigned int power;
-    bool negative;
+    }    
+    int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8)) - 8;
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
-    uint8_t one = 1;
-     if(number1._number[0] < 127 && number2._number[0] > 127){
-        negateBits(number2);
-        negative = true;
-    } else if(number1._number[0] > 127 && number2._number[0] < 127){
-        negateBits(number1);
-        negative = true;
-    } else if (number1._number[0] > 127 && number2._number[0] > 127){
-        negateBits(number1);
-        negateBits(number2);
+    if(mostSignificantNumber1 < mostSignificantNumber2){
+        while(mostSignificantNumber1 != mostSignificantNumber2)
+        if(number1._number[0] > 127)
+            number1._number.instert(number1._number.begin(), 255);
+        else
+            number1._number.instert(number1._number.begin(), 0);
+        mostSignificantNumber1 += 8;
     }
-    TC number3;
-    while(true){
-        remainder = number1._number;
-        number3 = sub(number1, number2);
-        if( number3._number[0] > 127){
-            break;
-        } else {
-            number1._number = number3._number;
-            vectorAdd(&quotient[quotient.size() - 1], &one, 0);
-        }
+    unsigned int loop = (number2._position - 1 + (number2._number.size() * 8)) - (number2._position - 1 + (number2._number.size() * 8));
+    vector<uint8_t> result(number1._number.size()); //tu wymik
+    vector<uint8_t> loopResult(number2.size());
+    vector<uint8_t> numberA(number1._number.begin(), number1._number.begin() + number2._number.size()); //tu liczba number1 przesuwana
+    
+    loopResult = vectorSub(number, number2)
+    if(loopResult[0] > 127 && number2._number[0] < 128 || loopResult[0] < 127 && number2._number[0] > 128){
+        result[0] = 0;
+    } else {
+        result[0] = 1;
     }
 
-std::cout << "Quotient = "; printVector(quotient);
-std::cout << std::endl;
-std::cout << "Reminder = "; printVector(remainder);
+    
+    if(number1._number[0] < 127 && number2._number[0] < 127){
+        negateIntegerBits(number1);
+        negateIntegerBits(number2);
+    }
+    else if (number1._number[0] > 127 && number2._number[0] < 127){
+        negateIntegerBits(number2);
+        negate = true;
+    }
+    else if (number1._number[0] < 127 && number2._number[0] > 127){
+        negateIntegerBits(number1);
+        negate = true;
+    } 
 }
 
 bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNumber1, unsigned int mostSignificantNumber2){
