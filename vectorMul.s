@@ -13,8 +13,6 @@ vectorMul:
     movl 20(%ebp), %edi     #rozmiar pierwsze
     movl 24(%ebp), %ebp #petla
     
-
-ptprod:
     movl %edi, %esi         
     add %ebp, %esi
     dec %edi                

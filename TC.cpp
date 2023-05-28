@@ -230,13 +230,43 @@ if(mostSignificant > 0){
 TC TC::add(TC number1, TC number2){
 
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
+    unsigned int comma = 0;
+    while (number1._position < 0 || number2._position < 0) {
+        if (number1._position < 0 && number2._position < 0) {
+                number1._position += 8;
+                number2._position += 8;
+                if(number1._position == 0){ 
+                   number1._number.insert(number1._number.begin(), 0);
+                }
+                if(number2._position == 0){
+                   number2._number.insert(number2._number.begin(), 0); 
+                }
+                comma++;
+        }
+        else if (number1._position >= 0 && number2._position < 0) {
+                number1._number.push_back(0);
+                number2._position += 8;
+                if(number2._position == 0){
+                   number2._number.insert(number2._number.begin(), 0); 
+                }  
+                comma++;              
+        }
+        else if (number1._position < 0 && number2._position  >= 0) {
+                number2._number.push_back(0);
+                number1._position += 8;
+                if(number1._position == 0){
+                   number1._number.insert(number1._number.begin(), 0);
+                }
+                comma++;
+        }
+    }
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
                            mostSignificantNumber1 : mostSignificantNumber2;
     int number3Size = ((mostSignificant - leastSignificant) + 9) / 8 ; 
     vector<uint8_t> newNumber(number3Size);
-    TC newTC(newNumber, leastSignificant);
+    TC newTC(newNumber, 0);
     int tempLS = mostSignificant;
     unsigned int index1 = 1, index2 = 1;
 
@@ -276,7 +306,7 @@ TC TC::add(TC number1, TC number2){
     } else if(isNumberZero(number1) && number2._number[0] < 127){
         newTC._number.erase(newTC._number.begin());
     }
-    
+    newTC._position = leastSignificant - (comma * 8);
     return newTC; 
 }
     
@@ -284,13 +314,43 @@ TC TC::add(TC number1, TC number2){
  TC TC::sub(TC number1, TC number2){
    
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
+    unsigned int comma = 0;
+    while (number1._position < 0 || number2._position < 0) {
+        if (number1._position < 0 && number2._position < 0) {
+                number1._position += 8;
+                number2._position += 8;
+                if(number1._position == 0){ 
+                   number1._number.insert(number1._number.begin(), 0);
+                }
+                if(number2._position == 0){
+                   number2._number.insert(number2._number.begin(), 0); 
+                }
+                comma++;
+        }
+        else if (number1._position >= 0 && number2._position < 0) {
+                number1._number.push_back(0);
+                number2._position += 8;
+                if(number2._position == 0){
+                   number2._number.insert(number2._number.begin(), 0); 
+                }  
+                comma++;              
+        }
+        else if (number1._position < 0 && number2._position  >= 0) {
+                number2._number.push_back(0);
+                number1._position += 8;
+                if(number1._position == 0){
+                   number1._number.insert(number1._number.begin(), 0);
+                }
+                comma++;
+        }
+    }
     int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
     int mostSignificant =  mostSignificantNumber1 > mostSignificantNumber2 ?
                            mostSignificantNumber1 : mostSignificantNumber2; 
     int number3Size = ((mostSignificant - leastSignificant) + 9) / 8 ; 
     vector<uint8_t> newNumber(number3Size);
-    TC newTC(newNumber, leastSignificant);
+    TC newTC(newNumber, 0);
     int tempLS = mostSignificant;
     unsigned int index1 = 1, index2 = 1;
     while(mostSignificantNumber1 != tempLS){
@@ -327,12 +387,43 @@ TC TC::add(TC number1, TC number2){
     } else if(isNumberZero(number1) && number2._number[0] < 127){
         newTC._number.erase(newTC._number.begin());
     }
+
+    newTC._position = leastSignificant - (comma * 8);
     return newTC; 
 }
 
  TC TC::mul(TC number1, TC number2){
-   
+   unsigned int comma = 0;
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
+    while (number1._position < 0 || number2._position < 0) {
+        if (number1._position < 0 && number2._position < 0) {
+                number1._position += 8;
+                number2._position += 8;
+                if(number1._position == 0){ 
+                   number1._number.insert(number1._number.begin(), 0);
+                }
+                if(number2._position == 0){
+                   number2._number.insert(number2._number.begin(), 0); 
+                }
+                comma++;
+        }
+        else if (number1._position >= 0 && number2._position < 0) {
+                number1._number.push_back(0);
+                number2._position += 8;
+                if(number2._position == 0){
+                   number2._number.insert(number2._number.begin(), 0); 
+                }  
+                comma++;              
+        }
+        else if (number1._position < 0 && number2._position  >= 0) {
+                number2._number.push_back(0);
+                number1._position += 8;
+                if(number1._position == 0){
+                   number1._number.insert(number1._number.begin(), 0);
+                }
+                comma++;
+        }
+    }
     vector<uint8_t> newNumber(number1._number.size() + number2._number.size());
     bool negate = false;
     if(number1._number[0] > 127 && number2._number[0] > 127){
@@ -351,84 +442,129 @@ TC TC::add(TC number1, TC number2){
     for (int i = number2._number.size() - 1; i >= 0; i--) {
        vectorMul(&number1._number[0], &number2._number[i], &newNumber[0], number1._number.size(), i);
     }
-    TC newTC(newNumber, leastSignificant);
+    TC newTC(newNumber, 0);
     
     if(negate){
         negateIntegerBits(newTC);
     }
-    
+    newTC._position = leastSignificant - (8 * comma);
     return  newTC;
 }
 
-void TC::div(TC number1, TC number2){
-    if(number1._position > number2._position){
-        while(number1._position != number2._position){
-            number2._number.push_back(0);
-            number1._position -= 8;
+void TC::div(TC number1, TC number2) {
+
+    unsigned int comma = 0;
+    int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
+    while (number1._position < 0 || number2._position < 0) {
+        if (number1._position < 0 && number2._position < 0) {
+                number1._position += 8;
+                number2._position += 8;
+                if(number1._position == 0){ 
+                   number1._number.insert(number1._number.begin(), 0);
+                }
+                if(number2._position == 0){
+                   number2._number.insert(number2._number.begin(), 0); 
+                }
+                comma++;
         }
-    }    
-    int mostSignificantNumber1 = (number1._position - 9 + (number1._number.size() * 8));
+        else if (number1._position >= 0 && number2._position < 0) {
+                number1._number.push_back(0);
+                number2._position += 8;
+                if(number2._position == 0){
+                   number2._number.insert(number2._number.begin(), 0); 
+                }  
+                comma++;              
+        }
+        else if (number1._position < 0 && number2._position  >= 0) {
+                number2._number.push_back(0);
+                number1._position += 8;
+                if(number1._position == 0){
+                   number1._number.insert(number1._number.begin(), 0);
+                }
+                comma++;
+        }
+    }
+
+
+    int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
     int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
-    
-    if(mostSignificantNumber1 < mostSignificantNumber2){
-        while(mostSignificantNumber1 != mostSignificantNumber2)
-        {
-            if(number1._number[0] > 127)
-                number1._number.insert(number1._number.begin(), 255);
-            else
-                number1._number.insert(number1._number.begin(), 0);
-            mostSignificantNumber1 += 8;
-        }
-
+    bool negate = false;
+    while (mostSignificantNumber1 <= mostSignificantNumber2)
+    {
+        if (number1._number[0] > 127)
+            number1._number.insert(number1._number.begin(), 255);
+        else
+            number1._number.insert(number1._number.begin(), 0);
+        mostSignificantNumber1 += 8;
     }
-    unsigned int loop = number1._number.size()- number2._number.size() ;
-    vector<uint8_t> result(number1._number.size()); //tu wymik
-    vector<uint8_t> loopResult(number2._number.size());
-    vector<uint8_t> numberA(number1._number.begin(), number1._number.begin() + number2._number.size()); //tu liczba number1 przesuwana
-    unsigned int size = number2._number.size(); 
-    TC number (numberA, number2._position);
-    TC loopResult2(loopResult, number2._position);
-    std::cout <<"Looprestult2 przed  " << printTC(number) << std::endl;
-    std::cout <<"Looprestult2  number 2 " << printTC(number2) << std::endl;
-    
-    loopResult2 = sub(number, number2);
-    std::cout <<"Looprestult2  " << printTC(loopResult2) << std::endl;
-    if((loopResult2._number[0] > 127 && number2._number[0] < 128) || (loopResult2._number[0] < 128 && number2._number[0] > 127)){
-        result[0] = 0;
-    } else {
-        std::cout << "tutaj";
-        result[0] = 1;
-    }
-
-    printVector(result);
-    std::cout << std::endl << printTC(loopResult2) << std::endl;
-    std::cout <<"loop = " << loop << std::endl;
-    for(loop; loop > 0; loop--){
-        for(int i = 0; i <= 7; i++){
-            shiftDiv(loopResult2._number, number1._number[size]);
-            if((loopResult2._number[0] > 127 && number2._number[0] < 128) || (loopResult2._number[0] < 128 && number2._number[0] > 127 )){
-                loopResult2 = sub(number, number2);
-            }
-        }
-            std::cout << loop << std::endl;
-
-    }
-    TC result2(result, 0);
-    //TC mulResult = mul(result2, number2);
-    //std::cout << printTC(mulResult) << std::endl;
-    //if mnozenie razy to bedzie rowne to nic jak nie to 
-   /* if(number1._number[0] < 127 && number2._number[0] < 127){
+    if(number1._number[0] > 127 && number2._number[0] > 127){
         negateIntegerBits(number1);
         negateIntegerBits(number2);
     }
     else if (number1._number[0] > 127 && number2._number[0] < 127){
-        negateIntegerBits(number2);
+        negateIntegerBits(number1);
         negate = true;
     }
     else if (number1._number[0] < 127 && number2._number[0] > 127){
-        negateIntegerBits(number1);
+        negateIntegerBits(number2);
         negate = true;
-    } */
+    } 
+    
+    unsigned int loop = number1._number.size() - number2._number.size();
+    vector<uint8_t> numberA(number1._number.begin(), number1._number.begin() + number2._number.size());
+    vector<uint8_t> loopResult(number2._number.size()); //tu wynik odejmowania/dodawania
+    
+    vector<uint8_t> result(number1._number.size()); //tu wymik
+
+    unsigned int size = number2._number.size();
+    
+    numberA.insert(numberA.begin(), 0);
+    if ((numberA[1] > 127 && number2._number[0] > 127) || (numberA[1] < 128 && number2._number[0] < 128)) {
+        vectorSub(&numberA[1], &number2._number[0], size - 1);
+    }
+    else {
+        vectorAdd(&numberA[1], &number2._number[0], size - 1);
+    }
+    numberA.erase(numberA.begin());
+    std::cout << std::endl;
+    std::cout << std::endl;
+
+    printVector(numberA);
+    std::cout << std::endl;
+    printVector(number2._number);
+
+    //std::cout << "Looprestult2 przed  " << printTC(number) << std::endl;
+    //std::cout << "Looprestult2  number 2 " << printTC(number2) << std::endl;
+
+    //loopResult2 = sub(number, number2);
+    //std::cout << "Looprestult2  " << printTC(loopResult2) << std::endl;
+   // if ((loopResult2._number[0] > 127 && number2._number[0] < 128) || (loopResult2._number[0] < 128 && number2._number[0] > 127)) {
+  //      result[0] = 0;
+   // }
+//    else {
+        //std::cout << "tutaj";
+ //       result[0] = 1;
+//    }
+
+ //   printVector(result);
+ //   std::cout << std::endl << printTC(loopResult2) << std::endl;
+    //std::cout << "loop = " << loop << std::endl;
+  /*  for (loop; loop > 0; loop--) {
+        for (int i = 0; i <= 7; i++) {
+            shiftDiv(loopResult2._number, number1._number[size]);
+            if ((loopResult2._number[0] > 127 && number2._number[0] < 128) || (loopResult2._number[0] < 128 && number2._number[0] > 127)) {
+                //loopResult2 = sub(number, number2);
+            }
+        }
+        std::cout << loop << std::endl;
+
+    }
+    */
+    TC result2(result, 0);
+    //TC mulResult = mul(result2, number2);
+    //std::cout << printTC(mulResult) << std::endl;
+    //if mnozenie razy to bedzie rowne to nic jak nie to 
+   
 }
 
 bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNumber1, unsigned int mostSignificantNumber2){
