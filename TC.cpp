@@ -15,6 +15,15 @@ bool TC::isNumberZero(TC number){
     }
     return true;
 }
+
+bool TC::isNumberZero(vector<uint8_t> number){
+    for (const auto& el : number)
+    {  
+        if(el != 0) return false;
+    }
+    return true;
+}
+
 vector<uint8_t> TC::getNumber(TC number){
     return number._number;
 }
@@ -200,13 +209,15 @@ std::string TC::printTC(TC number)
     }
 }
 
-void TC::negateBits(TC& number){
-   
-    for(int i = 0; i < number._number.size(); i++){
-       number._number[i] = ~(number._number[i]);
+void TC::negateBits(vector<uint8_t>& number){
+    if(isNumberZero(number)){
+        return;
+    }
+    for(int i = 0; i < number.size(); i++){
+       number[i] = ~(number[i]);
     } 
     uint8_t one = 1;
-    vectorAdd(&number._number[number._number.size() - 1], &one, 0);
+    vectorAdd(&number[number.size() - 1], &one, 0);
 }
 
 void TC::negateIntegerBits(TC& number){
@@ -393,6 +404,12 @@ TC TC::add(TC number1, TC number2){
 }
 
  TC TC::mul(TC number1, TC number2){
+
+    if(isNumberZero(number1) || isNumberZero(number2)){
+        vector<uint8_t> zero = {0};
+        return TC(zero, 0);
+    }
+        
    unsigned int comma = 0;
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
     while (number1._position < 0 || number2._position < 0) {
@@ -451,8 +468,14 @@ TC TC::add(TC number1, TC number2){
     return  newTC;
 }
 
-void TC::div(TC number1, TC number2) {
-
+TC TC::div(TC number1, TC number2) {
+    if((isNumberZero(number1) && isNumberZero(number2)) || (isNumberZero(number1))){
+        vector<uint8_t> zero = {0};
+        return TC(zero, 0);
+    }
+    else if(isNumberZero(number2)){
+        throw std::invalid_argument( "Division by 0. End of program execution" );
+    }
     unsigned int comma = 0;
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
     while (number1._position < 0 || number2._position < 0) {
@@ -509,87 +532,57 @@ void TC::div(TC number1, TC number2) {
         negateIntegerBits(number2);
         negate = true;
     } 
-    
     unsigned int loop = number1._number.size() - number2._number.size();
     vector<uint8_t> numberA(number1._number.begin(), number1._number.begin() + number2._number.size());
     vector<uint8_t> loopResult(number2._number.size()); //tu wynik odejmowania/dodawania
-    
     vector<uint8_t> result(number1._number.size()); //tu wymik
-
+    TC numberB(numberA, number1._position);
+    TC loopResultB(loopResult, number1._position);
     unsigned int size = number2._number.size();
-    
-    numberA.insert(numberA.begin(), 0);
-    if ((numberA[1] > 127 && number2._number[0] > 127) || (numberA[1] < 128 && number2._number[0] < 128)) {
-        vectorSub(&numberA[1], &number2._number[0], size - 1);
+
+    if ((numberA[0] > 127 && number2._number[0] > 127) || (numberA[0] < 128 && number2._number[0] < 128)) {
+        numberB = sub(numberB, number2);
     }
     else {
-        vectorAdd(&numberA[1], &number2._number[0], size - 1);
+        numberB = add(numberB, number2);
     }
-    numberA.erase(numberA.begin());
-    std::cout << std::endl;
-    std::cout << std::endl;
 
-    printVector(numberA);
-    std::cout << std::endl;
-    printVector(number2._number);
-
-    //std::cout << "Looprestult2 przed  " << printTC(number) << std::endl;
-    //std::cout << "Looprestult2  number 2 " << printTC(number2) << std::endl;
-
-    //loopResult2 = sub(number, number2);
-    //std::cout << "Looprestult2  " << printTC(loopResult2) << std::endl;
-   // if ((loopResult2._number[0] > 127 && number2._number[0] < 128) || (loopResult2._number[0] < 128 && number2._number[0] > 127)) {
-  //      result[0] = 0;
-   // }
-//    else {
-        //std::cout << "tutaj";
- //       result[0] = 1;
-//    }
-
- //   printVector(result);
- //   std::cout << std::endl << printTC(loopResult2) << std::endl;
-    //std::cout << "loop = " << loop << std::endl;
-  /*  for (loop; loop > 0; loop--) {
-        for (int i = 0; i <= 7; i++) {
-            shiftDiv(loopResult2._number, number1._number[size]);
-            if ((loopResult2._number[0] > 127 && number2._number[0] < 128) || (loopResult2._number[0] < 128 && number2._number[0] > 127)) {
-                //loopResult2 = sub(number, number2);
+    if ((numberB._number[0] > 127 && number2._number[0] > 127) || (numberB._number[0] < 128 && number2._number[0] < 128)) {
+        result[size - 1] = 1;
+    }
+    else {
+        result[size - 1] = 0;
+    }
+    
+    bool negateNumberA = false;
+    for(int i = 0; i < loop; i++){
+        for(int j = 0; j < 8; j++){
+            shiftDiv(numberB._number, number1._number[numberA.size() + i]);
+ 
+            if ((numberB._number[0] > 127 && number2._number[0] > 127) || (numberB._number[0] < 128 && number2._number[0] < 128)) {
+                 numberB = sub(numberB, number2);
             }
+            else {
+                 numberB = add(numberB, number2);
+            }
+            if ((numberB._number[0] > 127 && number2._number[0] > 127) || (numberB._number[0] < 128 && number2._number[0] < 128)) {
+                result[size + i] = result[size + i] << 1;
+                result[size + i] += 1;
+            }
+            else {
+                result[size + i] = result[size + i] << 1;
+            }      
         }
-        std::cout << loop << std::endl;
 
     }
-    */
-    TC result2(result, 0);
+    return TC(result,0);
     //TC mulResult = mul(result2, number2);
     //std::cout << printTC(mulResult) << std::endl;
     //if mnozenie razy to bedzie rowne to nic jak nie to 
    
 }
 
-bool TC::isNegativeBigger(TC number1, TC number2, unsigned int mostSignificantNumber1, unsigned int mostSignificantNumber2){
-    if(mostSignificantNumber1 / 8 > mostSignificantNumber2 / 8){
-        return true;
-    } else if (mostSignificantNumber1 / 8 < mostSignificantNumber2 / 8){
-        return false;
-    }
 
-    negateBits(number1);
-
-    for(int i = 0; i < number1._number.size() && i < number2._number.size(); i++){
-        if(number1._number[i] > number2._number[i]){
-            return true;
-        } else if(number1._number[i] < number2._number[i]){
-            return false;
-        }
-    }
-
-    if(number1._number.size() <= number2._number.size()){
-        return false;
-    } 
-
-    return true;
-}
 
 void TC::printVector(const vector<uint8_t>&  number){
     for(int i = 0; i < number.size(); i++){
@@ -623,16 +616,14 @@ void TC::changeIndex2(int& a) {
 
 void TC::shiftDiv(std::vector<uint8_t>& vec, uint8_t& value) {
     for (int i = 0; i < vec.size() - 1; i++) {
-
         uint8_t new_carry = (vec[i+1] >> 7) & 1;  
         vec[i+1] = (vec[i+1] << 1);
-        std::cout << (int)new_carry << std::endl;
         vec[i] = (vec[i] << 1);  
-        std::cout << (int) vec[i] << std::endl; 
         vec[i] = vec[i] + new_carry; 
     }
     uint8_t carry = (value >> 7) & 1;
     value = value << 1;
+    vec[vec.size() - 1] = (vec[vec.size() - 1]) << 1;
     vec[vec.size() - 1] += carry;
 
 }
