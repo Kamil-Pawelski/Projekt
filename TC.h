@@ -37,11 +37,19 @@ public:
     static TC div(TC number1, TC number2);
     static void changeIndex(int& a, int& b);
     static void changeIndex2(int& a);
+    static void shorterString(TC& number);
     static void shiftDiv(vector<uint8_t>& a, uint8_t& b);
     TC& operator=(const TC& other) {
         _number = other._number;
         _position = other._position;
         return *this;
+    }
+    bool operator==(const TC& other){
+        if(_position != other._position) return false;
+        for(int i=0;i<_number.size();i++){
+            if(_number[i]!=other._number[i]) return false;
+        }
+        return true;
     }
 
 };

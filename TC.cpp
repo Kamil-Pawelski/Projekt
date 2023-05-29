@@ -469,6 +469,7 @@ TC TC::add(TC number1, TC number2){
 }
 
 TC TC::div(TC number1, TC number2) {
+    TC copyNumber1 = number1;
     if((isNumberZero(number1) && isNumberZero(number2)) || (isNumberZero(number1))){
         vector<uint8_t> zero = {0};
         return TC(zero, 0);
@@ -477,6 +478,7 @@ TC TC::div(TC number1, TC number2) {
         throw std::invalid_argument( "Division by 0. End of program execution" );
     }
     unsigned int comma = 0;
+    bool negate = false;
     int leastSignificant = number1._position < number2._position ? number1._position : number2._position;
     while (number1._position < 0 || number2._position < 0) {
         if (number1._position < 0 && number2._position < 0) {
@@ -507,19 +509,6 @@ TC TC::div(TC number1, TC number2) {
                 comma++;
         }
     }
-
-
-    int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
-    int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
-    bool negate = false;
-    while (mostSignificantNumber1 <= mostSignificantNumber2)
-    {
-        if (number1._number[0] > 127)
-            number1._number.insert(number1._number.begin(), 255);
-        else
-            number1._number.insert(number1._number.begin(), 0);
-        mostSignificantNumber1 += 8;
-    }
     if(number1._number[0] > 127 && number2._number[0] > 127){
         negateIntegerBits(number1);
         negateIntegerBits(number2);
@@ -532,6 +521,18 @@ TC TC::div(TC number1, TC number2) {
         negateIntegerBits(number2);
         negate = true;
     } 
+
+    int mostSignificantNumber1 = (number1._position - 1 + (number1._number.size() * 8));
+    int mostSignificantNumber2 = (number2._position - 1 + (number2._number.size() * 8));
+    while (mostSignificantNumber1 <= mostSignificantNumber2)
+    {
+        if (number1._number[0] > 127)
+            number1._number.insert(number1._number.begin(), 255);
+        else
+            number1._number.insert(number1._number.begin(), 0);
+        mostSignificantNumber1 += 8;
+    }
+
     unsigned int loop = number1._number.size() - number2._number.size();
     vector<uint8_t> numberA(number1._number.begin(), number1._number.begin() + number2._number.size());
     vector<uint8_t> loopResult(number2._number.size()); //tu wynik odejmowania/dodawania
@@ -575,14 +576,76 @@ TC TC::div(TC number1, TC number2) {
         }
 
     }
-    return TC(result,0);
-    //TC mulResult = mul(result2, number2);
-    //std::cout << printTC(mulResult) << std::endl;
+    
+    TC newTC(result, 0); 
+
+    if(negate){
+        negateIntegerBits(newTC);
+        negateIntegerBits(copyNumber1);
+    }
+    TC mulResult = mul(newTC, number2);
+    shorterString(mulResult);
+    shorterString(copyNumber1);
+    
+    if(!(mulResult == copyNumber1)){
+        uint8_t zero = 0;
+        result.push_back(0);
+        for(int i = loop; i < loop + 1; i++){
+        for(int j = 0; j < 8; j++){
+            shiftDiv(numberB._number, zero);
+ 
+            if ((numberB._number[0] > 127 && number2._number[0] > 127) || (numberB._number[0] < 128 && number2._number[0] < 128)) {
+                 numberB = sub(numberB, number2);
+            }
+            else {
+                 numberB = add(numberB, number2);
+            }
+            if ((numberB._number[0] > 127 && number2._number[0] > 127) || (numberB._number[0] < 128 && number2._number[0] < 128)) {
+                result[size + i] = result[size + i] << 1;
+                result[size + i] += 1;
+            }
+            else {
+                result[size + i] = result[size + i] << 1;
+            }  
+           
+        }
+         int position = leastSignificant - (8 * comma) - 8;
+         TC newTC2(result, 0);
+         if(negate){
+         negateIntegerBits(newTC2);
+         }  
+         newTC2._position = leastSignificant - (8 * comma) - 8;
+         return newTC2;  
+    }
+    }
     //if mnozenie razy to bedzie rowne to nic jak nie to 
-   
+    newTC._position = leastSignificant - (8 * comma);
+    return newTC;
+
 }
 
+void TC::shorterString(TC& number){
+    int i = 1;
+    while((number._position + number._number.size() * 8) > 0 && number._number.size() > 1){
+         if(number._number[i] > 127 && number._number[0] > 127){
+            number._number.erase(number._number.begin());
+            continue;
+        } else if(number._number[i] < 128 && number._number[0] == 0) {
+            number._number.erase(number._number.begin());
+            continue;
+        }
+        break;
+    }
 
+    while(number._position < 0 && number._number.size() > 1){
+         if(number._number[number._number.size() - 1] == 0){
+            number._number.pop_back();
+            number._position += 8;
+            continue;
+         }
+        break;
+    }
+}
 
 void TC::printVector(const vector<uint8_t>&  number){
     for(int i = 0; i < number.size(); i++){
