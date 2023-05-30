@@ -1,11 +1,10 @@
 #include <iostream>
 #include "TC.h"
-//zrobic do mnożenia jak w dzieleniu czyli przesunac liczbe zeby byla bez przecinka
-//wyniki od razu wypisywac  
+  
 
 int main(){
 
-vector<uint8_t> ab = {0b11111101}; 
+vector<uint8_t> ab = {0b11111110}; 
 vector<uint8_t> ac = {2}; 
  std::cout << std::endl;
  TC a(ab,0);
@@ -36,5 +35,3 @@ std::cout << "div = " << TC::printTC(result);
 std::cout << std::endl;
 return 0;
 }
-//ZNAKI RÓWNE 1 -
-//ZNAKI RÓŻNE 0 +
